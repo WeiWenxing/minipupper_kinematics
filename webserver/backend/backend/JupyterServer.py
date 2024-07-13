@@ -15,7 +15,40 @@ class JupyterServer:
         self.current_process = None
 
     def handle_command(self, command):
-        if command.startswith("PushUp"):
+        if command.startswith("1D"):
+            try:
+                parts = command.split(' ', 1)
+                contents = parts[1].split('|')
+                with open('./1D_execute.py', 'r') as f:
+                    lines = f.readlines()
+                    new_line1 ='theta = np.radians(' + contents[0] + ')\n'
+                    new_line2 ='gamma = np.radians(' + contents[1] + ')\n'
+                    lines[4] = new_line1
+                    lines[5] = new_line2
+                with open('./1D_execute.py', 'w') as f:
+                    f.writelines(lines)
+            except Exception as e:
+                return f"Failed: {e}"
+            try:
+                self.current_process = subprocess.Popen(['python', './1D_execute.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                return f"Process Started"
+            except Exception as e:
+                return f"Failed to run: {e}"            
+        elif command.startswith('ANI'):
+            parts = command.split(' ', 1)
+            contents = parts[1].split('|')
+            with open('./1D_animate.py', 'r') as f:
+                lines = f.readlines()
+                replace1 = 'theta = ' + contents[0] + '\n'
+                replace2 = 'gamma = ' + contents[1] + '\n'
+                lines[8] = replace1
+                lines[9] = replace2
+            with open('./1D_animate.py', 'w') as f:
+                f.writelines(lines)
+            self.current_process = subprocess.Popen(['python', './1D_animate.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            self.process_running = True
+            return f"Process Started"
+        elif command.startswith("PushUp"):
             try:
                 parts = command.split(' ', 1)
                 contents = parts[1].split('|')
@@ -92,6 +125,7 @@ class JupyterServer:
                             time.sleep(0.1)
                             break
                         command = data.decode().strip()
+                        print('received command: {command}')
                         if self.process_running and command != 'STOP':
                             if self.current_process.poll() is None:
                                 response = "Current Process is still running, please wait."

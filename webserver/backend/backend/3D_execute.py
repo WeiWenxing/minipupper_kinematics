@@ -11,12 +11,12 @@ gc = GaitController3D()
 params = {}
 gait_plan = []
 
-frequency = 1./10
+frequency = 1./34
 gc.step_length = 0.04
 gc.step_height = 0.02
 gc.number_of_points = 20
 params['vel_x'] = 0.5
-params['vel_y'] = 0.5
+params['vel_y'] = 0
 
 def _setGaitPlan(gc, params):
     angle = np.arctan2(params['vel_y'], params['vel_x'])
