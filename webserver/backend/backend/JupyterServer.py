@@ -15,44 +15,44 @@ class JupyterServer:
         self.current_process = None
 
     def handle_command(self, command):
-        if command.startswith("1D"):
+        if command.startswith("STA"):
             try:
                 parts = command.split(' ', 1)
                 contents = parts[1].split('|')
-                with open('./1D_execute.py', 'r') as f:
+                with open('./position_static.py', 'r') as f:
                     lines = f.readlines()
-                    new_line1 ='theta = np.radians(' + contents[0] + ')\n'
-                    new_line2 ='gamma = np.radians(' + contents[1] + ')\n'
+                    new_line1 ='theta = ' + contents[0] + '\n'
+                    new_line2 ='gamma = ' + contents[1] + '\n'
                     lines[4] = new_line1
                     lines[5] = new_line2
-                with open('./1D_execute.py', 'w') as f:
+                with open('./position_static.py', 'w') as f:
                     f.writelines(lines)
             except Exception as e:
                 return f"Failed: {e}"
             try:
-                self.current_process = subprocess.Popen(['python', './1D_execute.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                self.current_process = subprocess.Popen(['python', './position_static.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 return f"Process Started"
             except Exception as e:
                 return f"Failed to run: {e}"            
         elif command.startswith('ANI'):
             parts = command.split(' ', 1)
             contents = parts[1].split('|')
-            with open('./1D_animate.py', 'r') as f:
+            with open('./position_animate.py', 'r') as f:
                 lines = f.readlines()
                 replace1 = 'theta = ' + contents[0] + '\n'
                 replace2 = 'gamma = ' + contents[1] + '\n'
-                lines[8] = replace1
-                lines[9] = replace2
-            with open('./1D_animate.py', 'w') as f:
+                lines[9] = replace1
+                lines[10] = replace2
+            with open('./position_animate.py', 'w') as f:
                 f.writelines(lines)
-            self.current_process = subprocess.Popen(['python', './1D_animate.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            self.current_process = subprocess.Popen(['python', './position_animate.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             self.process_running = True
             return f"Process Started"
         elif command.startswith("PushUp"):
             try:
                 parts = command.split(' ', 1)
                 contents = parts[1].split('|')
-                with open('./2D_execute.py', 'r+') as f:
+                with open('./pushup_animate.py', 'r+') as f:
                     lines = []
                     for i in range(5):
                         line = f.readline()
@@ -71,7 +71,7 @@ class JupyterServer:
                         f.write(line + '\n')
                             
                 try:
-                    self.current_process = subprocess.Popen(['python', './2D_execute.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    self.current_process = subprocess.Popen(['python', './pushup_animate.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     self.process_running = True
                     return f"Process started"
                 except Exception as e:
@@ -82,7 +82,7 @@ class JupyterServer:
             try:
                 parts = command.split(' ', 1)
                 contents = parts[1].split('|')
-                with open('./3D_execute.py', 'r') as f:
+                with open('./gait3D_animate.py', 'r') as f:
                     lines = f.readlines()
                     new_lines = []
                     new_lines.append('frequency = ' + contents[0] + '\n')
@@ -92,13 +92,13 @@ class JupyterServer:
                     new_lines.append("params['vel_x'] = " + contents[4] + '\n')
                     new_lines.append("params['vel_y'] = " + contents[5] + '\n')
                     lines[13:19] = new_lines
-                with open('./3D_execute.py', 'w') as f:
+                with open('./gait3D_animate.py', 'w') as f:
                     f.writelines(lines)
             except Exception as e:
                 return f"failed: {e}"
                         
             try:
-                self.current_process = subprocess.Popen(['python', './3D_execute.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                self.current_process = subprocess.Popen(['python', './gait3D_animate.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 self.process_running = True
                 return f"Process Started"
             except Exception as e:
